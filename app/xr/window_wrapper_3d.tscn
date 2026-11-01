@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cwindowwrapper3d"]
+
+[ext_resource type="Script" path="res://xr/head_locked_window.gd" id="1"]
+[sub_resource type="QuadMesh" id="QuadMesh_1"]
+
+[node name="WindowWrapper3D" type="Node3D"]
+script = ExtResource("1")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(800, 600)
+render_target_update_mode = 4
+transparent_bg = false
+gui_embed_subwindows = true
+
+[node name="Quad" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_1")

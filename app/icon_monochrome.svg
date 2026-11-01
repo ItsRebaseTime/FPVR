@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Android themed-icon layer: must be a single flat color (the system
+       applies its own tint), so no gradients/accent colors here, just the
+       silhouette from icon_foreground.svg. -->
+  <g transform="translate(256 256) scale(0.62) translate(-256 -256)" fill="none" stroke="#ffffff">
+    <g stroke-width="10" stroke-linecap="round">
+      <line x1="256" y1="356" x2="162" y2="300"/>
+      <line x1="256" y1="356" x2="350" y2="300"/>
+      <line x1="256" y1="356" x2="162" y2="412"/>
+      <line x1="256" y1="356" x2="350" y2="412"/>
+    </g>
+    <g stroke-width="6" opacity="0.85">
+      <ellipse cx="152" cy="294" rx="40" ry="11" transform="rotate(-18 152 294)"/>
+      <ellipse cx="360" cy="294" rx="40" ry="11" transform="rotate(18 360 294)"/>
+      <ellipse cx="152" cy="418" rx="40" ry="11" transform="rotate(18 152 418)"/>
+      <ellipse cx="360" cy="418" rx="40" ry="11" transform="rotate(-18 360 418)"/>
+    </g>
+    <g fill="#ffffff" stroke="none">
+      <circle cx="152" cy="294" r="9"/>
+      <circle cx="360" cy="294" r="9"/>
+      <circle cx="152" cy="418" r="9"/>
+      <circle cx="360" cy="418" r="9"/>
+    </g>
+    <rect x="226" y="338" width="60" height="34" rx="10" fill="#ffffff" stroke="none"/>
+
+    <path d="M 150 118 Q 150 86 188 86 L 206 86 Q 214 86 214 98 L 214 108 Q 214 116 206 116 L 188 116 Q 182 116 182 122" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 362 118 Q 362 86 324 86 L 306 86 Q 298 86 298 98 L 298 108 Q 298 116 306 116 L 324 116 Q 330 116 330 122" stroke-width="16" stroke-linecap="round"/>
+
+    <rect x="96" y="150" width="320" height="148" rx="72" stroke-width="7"/>
+
+    <circle cx="186" cy="224" r="50" stroke-width="7"/>
+    <circle cx="326" cy="224" r="50" stroke-width="7"/>
+  </g>
+</svg>

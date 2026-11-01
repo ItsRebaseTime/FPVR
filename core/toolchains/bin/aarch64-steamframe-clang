@@ -1,0 +1,16 @@
+#!/bin/sh
+# zig cc stand-in for the Steam Frame ARM64 cross build -- same rationale as
+# the "Core: Build (Linux ARM64 - Steam Frame)" VSCode task: targets glibc
+# 2.17 (comfortably below anything SteamOS could plausibly ship) instead of
+# this host's own newer glibc, and strips -march=armv8-a since zig's clang
+# rejects it (the aarch64 target triple already implies that baseline) --
+# NCNN's aarch64-linux-gnu toolchain file sets that flag unconditionally.
+export ZIG_GLOBAL_CACHE_DIR="$(dirname "$0")/../../.zig-cache"
+args=""
+for a in "$@"; do
+    case "$a" in
+        -march=armv8-a) ;;
+        *) args="$args $a" ;;
+    esac
+done
+exec zig cc -target aarch64-linux-gnu.2.17 $args

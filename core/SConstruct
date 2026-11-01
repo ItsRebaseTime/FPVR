@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+import os
+
+env = SConscript("godot-cpp/SConstruct")
+
+if env["use_llvm"]:
+    # zig cc (used as the clang stand-in for the Steam Frame ARM64 cross
+    # build, so we can target an older glibc than this host's own -- see
+    # the VSCode task) refuses to link ".os" object files: it classifies
+    # inputs by extension and ".os" isn't one it recognizes, even though
+    # it's just SCons' usual suffix for PIC objects on POSIX and gcc/ld
+    # never cared. godot-cpp's own web.py tool works around the same
+    # kind of clang-based-toolchain quirk the same way.
+    env["SHOBJSUFFIX"] = ".o"
+
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp") + Glob("src/hw/*.cpp") + Glob("src/bridge/*.cpp") + Glob("src/input/*.cpp") + Glob("src/passthrough/*.cpp") + Glob("src/ai/*.cpp")
+
+if env["platform"] == "linux":
+    env.Append(LIBS=["pthread"])
+
+# InferenceEngine (src/ai/) links NCNN, which must already be cross-built for
+# this target via core/scripts/build_ncnn_arm64.sh (arm64) or a plain `cmake
+# --build` in ncnn/build-<arch> (x86_64 dev builds) -- see that script for
+# why NCNN isn't just built inline here (it needs the target's real
+# libvulkan.so at link time, fetched from the headset, which isn't
+# something this SConstruct should do on every build).
+ncnn_build_dir = "ncnn/build-arm64" if env.get("arch") == "arm64" else "ncnn/build-x86_64"
+env.Append(CPPPATH=["ncnn/src", ncnn_build_dir + "/src"])
+env.Append(LIBPATH=[
+    ncnn_build_dir + "/src",
+    ncnn_build_dir + "/glslang/SPIRV",
+    ncnn_build_dir + "/glslang/glslang",
+    ncnn_build_dir + "/glslang/glslang/OSDependent/Unix",
+])
+# Link order matters for glslang's own internal dependency chain (ncnn ->
+# glslang/SPIRV -> MachineIndependent -> GenericCodeGen/OSDependent); zig's
+# lld-based linker tolerates this without --start-group/--end-group, but
+# the order is kept dependency-first-to-last anyway for portability to a
+# plain ld.
+env.Append(LIBS=["ncnn", "glslang", "SPIRV", "MachineIndependent", "GenericCodeGen", "OSDependent", "glslang-default-resource-limits", "vulkan"])
+
+if env.get("arch") == "arm64" and env["platform"] == "linux":
+    # Same borrowed target libvulkan.so used to cross-build NCNN itself
+    # (see build_ncnn_arm64.sh) -- needed again here since this build also
+    # links against it directly.
+    env.Append(LIBPATH=["toolchains/sysroot-arm64/usr/lib"])
+
+if env["platform"] == "macos":
+    library = env.SharedLibrary(
+        "../app/addons/fpvr_core/bin/libfpvr_core.{}.{}.framework/libfpvr_core.{}.{}".format(
+            env["platform"], env["target"], env["platform"], env["target"]
+        ),
+        source=sources,
+    )
+else:
+    library = env.SharedLibrary(
+        "../app/addons/fpvr_core/bin/libfpvr_core{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+        source=sources,
+    )
+
+Default(library)

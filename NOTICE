@@ -1,0 +1,34 @@
+FPVR
+Copyright 2026 ItsRebaseTime
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes software from the following third-party projects:
+
+- NanoDet-Plus (https://github.com/RangiLyu/nanodet)
+  Copyright 2020-2021 RangiLyu
+  Licensed under the Apache License, Version 2.0.
+  The bundled person/vehicle detector model (app/assets/models/) is this
+  project's own pre-converted NCNN weights, used unmodified. The decode
+  logic in core/src/ai/nanodet_decoder.cpp is a port of this project's
+  demo_ncnn/nanodet.cpp. See app/assets/models/README.md and
+  core/src/ai/nanodet_decoder.h for details.
+
+- ncnn (https://github.com/Tencent/ncnn)
+  Copyright (C) 2017 Tencent
+  Licensed under the BSD 3-Clause License.
+  Vendored as a git submodule (core/ncnn), cross-compiled from
+  unmodified upstream source.
+
+- godot-cpp (https://github.com/godotengine/godot-cpp)
+  Copyright (c) 2017-present Godot Engine contributors
+  Licensed under the MIT License.
+  Vendored as a git submodule (core/godot-cpp), unmodified.
+
+- glslang (https://github.com/KhronosGroup/glslang)
+  Copyright (C) Khronos Group Inc. and others
+  Licensed under a BSD 2-Clause / BSD 3-Clause / MIT license combination
+  (see core/ncnn/glslang/LICENSE.txt for the exact terms per file; the
+  GPL-licensed bison-based preprocessor path included in upstream glslang
+  is not used or built by this project).
+  Vendored inside the ncnn submodule (core/ncnn/glslang), unmodified.

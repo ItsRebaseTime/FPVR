@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3 uid="uid://cshellvrsteamframe"]
+
+[ext_resource type="Script" path="res://shells/shell_vr_steamframe/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://xr/xr_rig.tscn" id="2"]
+[ext_resource type="Script" path="res://xr/xr_pointer.gd" id="11"]
+[ext_resource type="Script" path="res://core_services/control_mapper.gd" id="4"]
+[ext_resource type="Script" path="res://core_services/passthrough_controller.gd" id="5"]
+[ext_resource type="PackedScene" path="res://xr/window_wrapper_3d.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://windows/settings_window.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://xr/fpv_overlay.tscn" id="12"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="XRRig" parent="." instance=ExtResource("2")]
+
+[node name="XRPointer" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="ControlMapper" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="PassthroughController" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="SettingsWindow" parent="." instance=ExtResource("6")]
+content_scene = ExtResource("10")
+quad_size = Vector2(0.95, 0.95)
+viewport_size = Vector2i(1900, 1900)
+arc_yaw_deg = 0.0
+arc_pitch_deg = 0.0
+arc_distance_m = 0.6
+visible = false
+
+[node name="FPVOverlay" parent="." instance=ExtResource("12")]

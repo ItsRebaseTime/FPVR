@@ -1,0 +1,22 @@
+[configuration]
+entry_symbol = "fpvr_core_library_init"
+compatibility_minimum = 4.2
+# false, not true: "reloadable" only matters for live-reloading inside the
+# editor while iterating -- it has no effect on functionality in an
+# exported template_debug/template_release build. Traced four identical
+# field crashes (SIGSEGV inside __run_exit_handlers, always at the exact
+# same libc offset, with the faulting address matching no library gdb's
+# shared-library list could identify -- consistent with code that was
+# already dlclose()'d by the time an atexit/static-destructor callback
+# tried to run through it) directly to reloadable=true, which is a
+# documented source of exactly this class of exit-time crash in Godot's
+# GDExtension loader.
+reloadable = false
+
+[libraries]
+linux.debug.x86_64 = "res://addons/fpvr_core/bin/libfpvr_core.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://addons/fpvr_core/bin/libfpvr_core.linux.template_release.x86_64.so"
+linux.debug.arm64 = "res://addons/fpvr_core/bin/libfpvr_core.linux.template_debug.arm64.so"
+linux.release.arm64 = "res://addons/fpvr_core/bin/libfpvr_core.linux.template_release.arm64.so"
+android.debug.arm64 = "res://addons/fpvr_core/bin/libfpvr_core.android.template_debug.arm64.so"
+android.release.arm64 = "res://addons/fpvr_core/bin/libfpvr_core.android.template_release.arm64.so"

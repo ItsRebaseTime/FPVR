@@ -1,0 +1,440 @@
+[gd_scene load_steps=3 format=3 uid="uid://csettingswindow"]
+
+[ext_resource type="Script" path="res://windows/settings_window.gd" id="1"]
+[ext_resource type="PackedScene" path="res://windows/virtual_keyboard.tscn" id="2"]
+
+[node name="SettingsWindow" type="PanelContainer"]
+custom_minimum_size = Vector2(760, 620)
+script = ExtResource("1")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="OuterVBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Margin/OuterVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Settings"
+
+[node name="Tabs" type="TabContainer" parent="Margin/OuterVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="General" type="Control" parent="Margin/OuterVBox/Tabs"]
+layout_mode = 2
+
+[node name="CenterRegion" type="Control" parent="Margin/OuterVBox/Tabs/General"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.25
+anchor_right = 0.75
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PassthroughRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/PassthroughRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Passthrough"
+
+[node name="OptionButton" type="OptionButton" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/PassthroughRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InputRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/InputRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Flight input"
+
+[node name="OptionButton" type="OptionButton" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/InputRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AtakAddressRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/AtakAddressRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "ATAK address"
+
+[node name="LineEdit" type="LineEdit" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/AtakAddressRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AtakPortRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/AtakPortRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "ATAK port"
+
+[node name="SpinBox" type="SpinBox" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/AtakPortRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1
+max_value = 65535
+value = 6969
+
+[node name="SelfCallsignRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/SelfCallsignRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Self callsign"
+
+[node name="LineEdit" type="LineEdit" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/SelfCallsignRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UavCallsignRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/UavCallsignRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "UAV callsign"
+
+[node name="LineEdit" type="LineEdit" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/UavCallsignRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FpvWidthRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvWidthRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Window width %"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvWidthRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 30
+max_value = 70
+step = 1
+value = 70
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvWidthRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(50, 0)
+horizontal_alignment = 2
+text = "70%"
+
+[node name="FpvHeightRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvHeightRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Window height %"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvHeightRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 30
+max_value = 50
+step = 1
+value = 50
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox/FpvHeightRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(50, 0)
+horizontal_alignment = 2
+text = "50%"
+
+[node name="KeyboardOverlay" parent="Margin/OuterVBox/Tabs/General/CenterRegion/ScrollContainer/VBox" instance=ExtResource("2")]
+visible = false
+layout_mode = 2
+
+[node name="AIDetection" type="Control" parent="Margin/OuterVBox/Tabs"]
+visible = false
+layout_mode = 2
+
+[node name="CenterRegion" type="Control" parent="Margin/OuterVBox/Tabs/AIDetection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.25
+anchor_right = 0.75
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="EnabledRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/EnabledRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Detection enabled"
+
+[node name="CheckButton" type="CheckButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/EnabledRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="IncludeVehiclesRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/IncludeVehiclesRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Detect vehicles too"
+
+[node name="CheckButton" type="CheckButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/IncludeVehiclesRow"]
+layout_mode = 2
+button_pressed = false
+
+[node name="RateRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RateRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Detection rate"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.5
+max_value = 10.0
+step = 0.5
+value = 1.0
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RateRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "1.0 Hz"
+
+[node name="ConfidenceRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ConfidenceRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Confidence threshold"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ConfidenceRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ConfidenceRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "50%"
+
+[node name="BackendRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Backend"
+
+[node name="OptionButton" type="OptionButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BackendStatusRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendStatusRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Currently using"
+
+[node name="StatusLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendStatusRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "none"
+
+[node name="ShowOverlayRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ShowOverlayRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Show overlay"
+
+[node name="CheckButton" type="CheckButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ShowOverlayRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="RefereeExclusionRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RefereeExclusionRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Referee exclusion"
+
+[node name="CheckButton" type="CheckButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RefereeExclusionRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="VestColorRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestColorRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Referee vest color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestColorRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 0.55, 0, 1)
+edit_alpha = false
+
+[node name="VestToleranceRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestToleranceRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Color match tolerance"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestToleranceRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.3
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestToleranceRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "30%"
+
+[node name="SendAtakRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/SendAtakRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Send to ATAK"
+
+[node name="CheckButton" type="CheckButton" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/SendAtakRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="CameraCalibLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "FPV camera calibration (for position estimate)"
+
+[node name="CameraTiltRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraTiltRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Tilt (deg down)"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraTiltRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -90
+max_value = 90
+step = 1
+value = 0
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraTiltRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "0 deg"
+
+[node name="CameraHFovRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraHFovRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Horizontal FOV"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraHFovRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 10
+max_value = 220
+step = 1
+value = 150
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraHFovRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "150 deg"
+
+[node name="CameraVFovRow" type="HBoxContainer" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraVFovRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 0)
+text = "Vertical FOV"
+
+[node name="HSlider" type="HSlider" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraVFovRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 10
+max_value = 220
+step = 1
+value = 110
+
+[node name="ValueLabel" type="Label" parent="Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/CameraVFovRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+horizontal_alignment = 2
+text = "110 deg"

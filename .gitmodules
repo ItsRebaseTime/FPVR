@@ -1,0 +1,7 @@
+[submodule "core/godot-cpp"]
+	path = core/godot-cpp
+	url = https://github.com/godotengine/godot-cpp
+	branch = 4.2
+[submodule "core/ncnn"]
+	path = core/ncnn
+	url = https://github.com/Tencent/ncnn

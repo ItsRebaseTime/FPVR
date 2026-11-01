@@ -1,0 +1,42 @@
+.godot/
+*.so
+*.dll
+*.dylib
+*.o
+*.os
+app/addons/fpvr_core/bin/
+core/godot-cpp/bin/
+core/.sconsign.dblite
+.sconsign.dblite
+core/.cross_bin_arm64/
+core/.zig-cache/
+
+# Target libvulkan.so fetched from the headset for cross-link-time use only
+# (satisfies the linker's SONAME reference; the real on-device lib is used
+# at runtime) -- not ours to redistribute, re-fetched by build_ncnn_arm64.sh.
+core/toolchains/sysroot-arm64/
+core/ncnn/build-arm64/
+app/builds/
+
+# Generated Android custom-build project (from --install-android-build-template).
+# Our own additions (plugin source, AndroidManifest.xml, build.gradle, gradle.properties
+# edits) are committed; everything below is either Gradle build output or prebuilt
+# binaries re-fetched by re-running the template install, so not worth version-controlling.
+app/android/build/build/
+app/android/build/libs/
+app/android/build/.gradle/
+# Godot's own export output copied into the custom-build project each
+# export (compiled .gdc bytecode, .remap files, packed .sparsepck) --
+# regenerated every build, not meant to be version-controlled.
+app/android/build/src/main/assets/
+# Launcher icon PNGs Godot copies into the gradle project's res/ tree each
+# export, regenerated from app/icon*.svg -> app/launcher_icon_*.png every
+# time. mipmap-anydpi-v26/ is kept: it's just the small XML referencing
+# these by name (icon.xml), not a generated binary asset.
+app/android/build/res/mipmap/
+app/android/build/res/mipmap-hdpi-v4/
+app/android/build/res/mipmap-mdpi-v4/
+app/android/build/res/mipmap-xhdpi-v4/
+app/android/build/res/mipmap-xxhdpi-v4/
+app/android/build/res/mipmap-xxxhdpi-v4/
+app/android/build/res/drawable/

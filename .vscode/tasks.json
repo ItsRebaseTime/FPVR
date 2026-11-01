@@ -1,0 +1,159 @@
+{
+	// See README.md for the full explanation of each build step. Paths here
+	// (NDK, Godot binary) match this machine's setup from the project's
+	// development session -- adjust ANDROID_NDK_ROOT below if yours differs.
+	//
+	// "shell" tasks otherwise run under whatever the user's default login
+	// shell is -- on this machine that's fish, which doesn't understand the
+	// bash `for x in a b; do ...; done` syntax the ARM64 cross-compile task
+	// below uses (it fails immediately with "Missing end to balance this
+	// for loop" before scons ever runs). Pinning bash here for every task
+	// avoids that whole class of shell-portability breakage.
+	"version": "2.0.0",
+	"options": {
+		"shell": { "executable": "/bin/bash", "args": ["-c"] }
+	},
+	"inputs": [],
+	"tasks": [
+		// ---------------------------------------------------------------
+		// Core (GDExtension) builds
+		// ---------------------------------------------------------------
+		{
+			"label": "Core: Build (Linux x86_64)",
+			"type": "shell",
+			"command": "scons",
+			"args": ["platform=linux", "target=template_debug", "-j$(nproc)"],
+			"options": { "cwd": "${workspaceFolder}/core" },
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			"label": "Core: Build (Android arm64)",
+			"type": "shell",
+			"command": "scons",
+			"args": ["platform=android", "arch=arm64", "target=template_debug", "-j$(nproc)"],
+			"options": {
+				"cwd": "${workspaceFolder}/core",
+				"env": {
+					"ANDROID_HOME": "",
+					"ANDROID_NDK_ROOT": "${env:HOME}/Android/Sdk/ndk/29.0.14206865"
+				}
+			},
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			// Cross-compiling with the host's own aarch64-linux-gnu-gcc links
+			// against CachyOS/Arch's bleeding-edge glibc, which is newer than
+			// what SteamOS ships -- the first version of this task did that,
+			// and the resulting .so failed to dlopen on real Steam Frame
+			// hardware with "GLIBC_2.43 not found". Fixed by using `zig cc`/
+			// `zig c++` (requires `sudo pacman -S zig`) targeting an explicit
+			// old glibc (2.17, the conservative "manylinux2014" baseline --
+			// comfortably below anything SteamOS could plausibly ship) instead
+			// of whatever this host's own toolchain happens to bundle. godot-
+			// cpp's own tools/linux.py already has a use_llvm path for exactly
+			// this (skips a GCC-only flag clang rejects); its only remaining
+			// friction are (a) "-march=armv8-a", which zig's clang rejects --
+			// stripped here since an aarch64 target triple already implies
+			// that baseline -- and (b) SCons' ".os" shared-object suffix,
+			// which zig's driver doesn't recognize by extension (see
+			// core/SConstruct's use_llvm branch). ar/ranlib/ld/strip/objcopy
+			// stay the real aarch64-linux-gnu-* binutils -- they don't link
+			// against target glibc, so the version mismatch doesn't apply.
+			"label": "Core: Build (Linux ARM64 - Steam Frame)",
+			"type": "shell",
+			"command": "mkdir -p .zig-cache .cross_bin_arm64 && for t in ar ranlib ld strip objcopy; do ln -sf \"$(command -v aarch64-linux-gnu-$t)\" .cross_bin_arm64/$t; done && printf '#!/bin/sh\\nexport ZIG_GLOBAL_CACHE_DIR=\"%s/.zig-cache\"\\nargs=\"\"\\nfor a in \"$@\"; do case \"$a\" in -march=armv8-a) ;; *) args=\"$args $a\" ;; esac; done\\nexec zig cc -target aarch64-linux-gnu.2.17 $args\\n' \"$(pwd)\" > .cross_bin_arm64/clang && printf '#!/bin/sh\\nexport ZIG_GLOBAL_CACHE_DIR=\"%s/.zig-cache\"\\nargs=\"\"\\nfor a in \"$@\"; do case \"$a\" in -march=armv8-a) ;; *) args=\"$args $a\" ;; esac; done\\nexec zig c++ -target aarch64-linux-gnu.2.17 $args\\n' \"$(pwd)\" > .cross_bin_arm64/clang++ && chmod +x .cross_bin_arm64/clang .cross_bin_arm64/clang++ && PATH=\"$(pwd)/.cross_bin_arm64:$PATH\" scons platform=linux arch=arm64 target=template_debug use_llvm=yes -j$(nproc)",
+			"options": { "cwd": "${workspaceFolder}/core" },
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			"label": "Core: Build All Targets",
+			"dependsOn": ["Core: Build (Linux x86_64)", "Core: Build (Android arm64)", "Core: Build (Linux ARM64 - Steam Frame)"],
+			"dependsOrder": "sequence",
+			"group": "build",
+			"problemMatcher": []
+		},
+
+		// ---------------------------------------------------------------
+		// Godot exports (each depends on its matching core build)
+		// ---------------------------------------------------------------
+		{
+			"label": "Export: Linux Executable (x86_64 desktop dev)",
+			"type": "shell",
+			"command": "mkdir -p builds/linux && godot --headless --path . --export-debug \"Linux (x86_64 desktop)\" builds/linux/fpvr.x86_64",
+			"options": { "cwd": "${workspaceFolder}/app" },
+			"dependsOn": ["Core: Build (Linux x86_64)"],
+			"group": { "kind": "build", "isDefault": true },
+			"problemMatcher": [],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			// This is the one to actually run on Steam Frame: it's a real
+			// Linux/SteamOS device on a Snapdragon (ARM64) SoC, not Android --
+			// the Android preset below is for the companion phone only.
+			"label": "Export: Steam Frame (Linux ARM64)",
+			"type": "shell",
+			"command": "mkdir -p builds/steamframe && godot --headless --path . --export-debug \"Steam Frame (Linux ARM64)\" builds/steamframe/fpvr.arm64",
+			"options": { "cwd": "${workspaceFolder}/app" },
+			"dependsOn": ["Core: Build (Linux ARM64 - Steam Frame)"],
+			"group": "build",
+			"problemMatcher": [],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			"label": "Export: Android APK (debug)",
+			"type": "shell",
+			"command": "mkdir -p builds/android && godot --headless --path . --export-debug \"Android\" builds/android/fpvr-debug.apk",
+			"options": { "cwd": "${workspaceFolder}/app" },
+			"dependsOn": ["Core: Build (Android arm64)"],
+			"group": "build",
+			"problemMatcher": [],
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			"label": "Export: All Targets",
+			"dependsOn": ["Export: Linux Executable (x86_64 desktop dev)", "Export: Steam Frame (Linux ARM64)", "Export: Android APK (debug)"],
+			"dependsOrder": "sequence",
+			"group": "build",
+			"problemMatcher": []
+		},
+
+		// ---------------------------------------------------------------
+		// Run / iterate
+		// ---------------------------------------------------------------
+		{
+			"label": "Run: Linux Executable",
+			"type": "shell",
+			"command": "./fpvr.x86_64",
+			"options": { "cwd": "${workspaceFolder}/app/builds/linux" },
+			"dependsOn": ["Export: Linux Executable (x86_64 desktop dev)"],
+			"group": "test",
+			"problemMatcher": [],
+			"presentation": { "reveal": "always", "panel": "dedicated" }
+		},
+		{
+			"label": "Run: Project in Godot (no export, fastest iteration)",
+			"type": "shell",
+			"command": "godot --path .",
+			"options": { "cwd": "${workspaceFolder}/app" },
+			"dependsOn": ["Core: Build (Linux x86_64)"],
+			"group": "test",
+			"problemMatcher": [],
+			"presentation": { "reveal": "always", "panel": "dedicated" }
+		},
+		{
+			"label": "Install Android Build Template",
+			"type": "shell",
+			"command": "godot --headless --path . --install-android-build-template --export-debug \"Android\" builds/android/fpvr-debug.apk",
+			"options": { "cwd": "${workspaceFolder}/app" },
+			"detail": "Only needed once, or after deleting app/android/build -- regenerates the Gradle custom-build project (see README.md).",
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}

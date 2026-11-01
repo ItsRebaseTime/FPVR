@@ -1,0 +1,11 @@
+#!/bin/sh
+# C++ counterpart to aarch64-steamframe-clang -- see that file for rationale.
+export ZIG_GLOBAL_CACHE_DIR="$(dirname "$0")/../../.zig-cache"
+args=""
+for a in "$@"; do
+    case "$a" in
+        -march=armv8-a) ;;
+        *) args="$args $a" ;;
+    esac
+done
+exec zig c++ -target aarch64-linux-gnu.2.17 $args

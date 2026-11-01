@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="lensGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7fe7ff"/>
+      <stop offset="0.6" stop-color="#2bb8e0"/>
+      <stop offset="1" stop-color="#157a99"/>
+    </radialGradient>
+    <linearGradient id="armGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8fefff"/>
+      <stop offset="1" stop-color="#2bb8e0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Same artwork as icon.svg but transparent background and scaled/
+       centered into Android's adaptive-icon safe zone (inner ~66% of the
+       canvas survives any mask shape). -->
+  <g transform="translate(256 256) scale(0.62) translate(-256 -256)">
+    <g stroke="url(#armGrad)" stroke-width="10" stroke-linecap="round">
+      <line x1="256" y1="356" x2="162" y2="300"/>
+      <line x1="256" y1="356" x2="350" y2="300"/>
+      <line x1="256" y1="356" x2="162" y2="412"/>
+      <line x1="256" y1="356" x2="350" y2="412"/>
+    </g>
+    <g fill="none" stroke="#bff3ff" stroke-width="6" opacity="0.85">
+      <ellipse cx="152" cy="294" rx="40" ry="11" transform="rotate(-18 152 294)"/>
+      <ellipse cx="360" cy="294" rx="40" ry="11" transform="rotate(18 360 294)"/>
+      <ellipse cx="152" cy="418" rx="40" ry="11" transform="rotate(18 152 418)"/>
+      <ellipse cx="360" cy="418" rx="40" ry="11" transform="rotate(-18 360 418)"/>
+    </g>
+    <g fill="#9ff2ff">
+      <circle cx="152" cy="294" r="9"/>
+      <circle cx="360" cy="294" r="9"/>
+      <circle cx="152" cy="418" r="9"/>
+      <circle cx="360" cy="418" r="9"/>
+    </g>
+    <rect x="226" y="338" width="60" height="34" rx="10" fill="#dff7ff"/>
+    <rect x="246" y="330" width="20" height="14" rx="4" fill="#2bb8e0"/>
+
+    <path d="M 150 118 Q 150 86 188 86 L 206 86 Q 214 86 214 98 L 214 108 Q 214 116 206 116 L 188 116 Q 182 116 182 122" fill="none" stroke="#3a4250" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 362 118 Q 362 86 324 86 L 306 86 Q 298 86 298 98 L 298 108 Q 298 116 306 116 L 324 116 Q 330 116 330 122" fill="none" stroke="#3a4250" stroke-width="16" stroke-linecap="round"/>
+
+    <rect x="96" y="150" width="320" height="148" rx="72" fill="#232a35" stroke="#4fd1ff" stroke-width="6"/>
+
+    <circle cx="186" cy="224" r="50" fill="#121722"/>
+    <circle cx="326" cy="224" r="50" fill="#121722"/>
+    <circle cx="186" cy="224" r="50" fill="none" stroke="url(#lensGlow)" stroke-width="7"/>
+    <circle cx="326" cy="224" r="50" fill="none" stroke="url(#lensGlow)" stroke-width="7"/>
+    <circle cx="186" cy="224" r="30" fill="url(#lensGlow)" opacity="0.55"/>
+    <circle cx="326" cy="224" r="30" fill="url(#lensGlow)" opacity="0.55"/>
+    <circle cx="172" cy="210" r="10" fill="#eafcff" opacity="0.8"/>
+    <circle cx="312" cy="210" r="10" fill="#eafcff" opacity="0.8"/>
+
+    <rect x="238" y="206" width="36" height="22" rx="8" fill="#171b24"/>
+  </g>
+</svg>
