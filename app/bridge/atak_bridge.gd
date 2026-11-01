@@ -56,7 +56,7 @@ func update_self_fix(fix: Dictionary) -> void:
 func update_uav_fix(fix: Dictionary) -> void:
 	_uav_fix = fix
 
-func _on_detections_updated(detections: Array) -> void:
+func _on_detections_updated(detections: Array, _frame_info: Dictionary) -> void:
 	_detections = detections
 
 func _process(delta: float) -> void:

@@ -7,11 +7,18 @@ extends Control
 ## DetectionService.detections_updated gives each detection's x/y/w/h as
 ## 0..1 fractions of the model's input frame (see
 ## core/src/ai/inference_engine.h's detect() doc comment) specifically so
-## this mapping is just a multiply by this Control's own size -- no need to
-## know the model's input resolution, the source UVC frame's resolution, or
-## how fpv_overlay.gd's quad is currently sized; sync_size() already keeps
-## this SubViewport's aspect matched to the video, so a 0..1 fraction here
-## lands in the same relative spot it did in the model's input frame.
+## this mapping is just a multiply by the rendering canvas's own pixel
+## size -- no need to know the model's input resolution, the source UVC
+## frame's resolution, or how fpv_overlay.gd's quad is currently sized;
+## sync_size() already keeps this SubViewport's aspect matched to the
+## video, so a 0..1 fraction here lands in the same relative spot it did
+## in the model's input frame.
+##
+## That canvas size is get_viewport().size, NOT this Control's own `size`
+## property -- see _canvas_size's doc comment below for why: `size` comes
+## back scaled by an unrelated content-scale factor, which previously
+## caused a real, shipped bug (boxes correctly shaped but consistently
+## offset toward bottom-right).
 ##
 ## No more inline "name confidence%" text drawn at each box: field testing
 ## showed that for a detection that fills most of the frame, the label
@@ -48,31 +55,67 @@ const LEGEND_FONT_SIZE := 16
 const LEGEND_BG_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 const LEGEND_TEXT_COLOR := Color(1.0, 1.0, 1.0, 1.0)
 
+# Debug diagnostic panel -- top-right, so it doesn't collide with the
+# legend (top-left). Settings.detection_show_debug_info-gated. Exists
+# specifically to root-cause a reported bug where boxes are correctly
+# *sized* but consistently offset in *position*, reproducible with the
+# camera held still (so it isn't frame-to-frame detection latency) --
+# showing the numbers at each stage (raw fraction -> model-input pixels
+# -> this Control's own pixel space, which is what _draw_boxes() above
+# actually uses) pinpoints which stage the offset is introduced at,
+# rather than guessing from the rendered image alone.
+const DEBUG_FONT_SIZE := 14
+const DEBUG_LINE_HEIGHT := 18.0
+const DEBUG_BG_COLOR := Color(0.0, 0.0, 0.0, 0.65)
+const DEBUG_TEXT_COLOR := Color(1.0, 1.0, 0.6, 1.0)
+const DEBUG_PANEL_WIDTH := 430.0
+const DEBUG_MAX_DETECTIONS_SHOWN := 6
+
 # Fixed display order -- always the same rows in the same order when
 # present, rather than shuffling based on whatever order detections
 # happened to come back in this frame, so the legend doesn't jitter.
 const LEGEND_ORDER := [0, "referee", 2, 7, 5] # person, referee, car, truck, bus
 
 var _detections: Array = []
+var _frame_info: Dictionary = {}
+
+# The actual pixel size of the SubViewport this Control is being drawn
+# into -- used for all box/legend/debug-panel math below INSTEAD OF this
+# Control's own `size` property. Root-caused a real bug (boxes correctly
+# shaped but consistently offset toward bottom-right, reproducible with
+# the camera held completely still so it wasn't detection-latency lag):
+# this Control's `size` silently comes back as exactly 2x what the
+# SubViewport actually renders at (confirmed reproducible at multiple
+# SubViewport sizes, always precisely 2.0x, on both a desktop dev machine
+# and the real Steam Frame) -- Godot's full-rect-anchor auto-resize
+# appears to pull in the host display's own content-scale-factor when
+# resolving a Control's size against its parent SubViewport, which
+# `get_viewport().size` is immune to since it reports the SubViewport's
+# own configured resolution directly, not a layout-resolved value.
+var _canvas_size: Vector2
 
 func _ready() -> void:
 	DetectionService.detections_updated.connect(_on_detections_updated)
 
-func _on_detections_updated(detections: Array) -> void:
+func _on_detections_updated(detections: Array, frame_info: Dictionary) -> void:
 	_detections = detections
+	_frame_info = frame_info
 	queue_redraw()
 
 func _draw() -> void:
+	_canvas_size = Vector2(get_viewport().size)
 	_draw_boxes()
 	_draw_legend()
+	if Settings.detection_show_debug_info:
+		_draw_debug_info()
 
 func _draw_boxes() -> void:
 	for detection in _detections:
 		var rect := Rect2(
-			detection.get("x", 0.0) * size.x,
-			detection.get("y", 0.0) * size.y,
-			detection.get("w", 0.0) * size.x,
-			detection.get("h", 0.0) * size.y,
+			detection.get("x", 0.0) * _canvas_size.x,
+			detection.get("y", 0.0) * _canvas_size.y,
+			detection.get("w", 0.0) * _canvas_size.x,
+			detection.get("h", 0.0) * _canvas_size.y,
 		)
 		var is_referee: bool = detection.get("referee_excluded", false)
 		var color: Color = REFEREE_COLOR if is_referee else CLASS_COLORS.get(detection.get("class_id", -1), DEFAULT_COLOR)
@@ -138,3 +181,58 @@ func _draw_legend() -> void:
 		# name is -- "aligned like a table" per the user's request,
 		# without needing a real table/grid container in a _draw() context.
 		draw_string(font, Vector2(name_x, text_baseline_y), str(counts[key]), HORIZONTAL_ALIGNMENT_RIGHT, count_right_x - name_x, LEGEND_FONT_SIZE, LEGEND_TEXT_COLOR)
+
+## Shows the numbers at every stage of the coordinate pipeline:
+##   - this SubViewport's actual render resolution (get_viewport().size,
+##     what _draw_boxes() above actually multiplies fractions by -- see
+##     _canvas_size) vs. this Control's own `size` property, left in here
+##     specifically so the ~2x discrepancy that caused the original bug
+##     stays visible/verifiable on-device rather than just in a comment.
+##   - the source camera frame size and the model's fixed input size,
+##     from frame_info (see detection_service.gd's detections_updated
+##     signal doc comment).
+##   - per detection: the raw 0..1 fraction InferenceEngine.detect()
+##     returned, that fraction converted to model-input-pixel-space
+##     (fraction * net_input_size) purely for human cross-reference, and
+##     that same fraction converted to this Control's pixel space
+##     (fraction * size) -- the literal numbers _draw_boxes() uses to
+##     draw the rect. If that last column visually lands on the object
+##     when you'd expect it to, the bug is downstream of this script
+##     (the quad/texture mapping, not this math); if it doesn't, the bug
+##     is in this math or in what detect() returned.
+func _draw_debug_info() -> void:
+	var font := ThemeDB.fallback_font
+	var viewport_size: Vector2 = get_viewport().size
+
+	var lines: Array[String] = []
+	lines.append("viewport.size: %dx%d (used for drawing)" % [int(viewport_size.x), int(viewport_size.y)])
+	lines.append("this Control.size: %dx%d (NOT used -- see note below)" % [int(size.x), int(size.y)])
+	lines.append("source frame: %dx%d" % [_frame_info.get("source_width", -1), _frame_info.get("source_height", -1)])
+	lines.append("model input: %dx%d" % [_frame_info.get("net_input_size", -1), _frame_info.get("net_input_size", -1)])
+	lines.append("")
+
+	var net_size: int = _frame_info.get("net_input_size", 416)
+	var shown := 0
+	for detection in _detections:
+		if shown >= DEBUG_MAX_DETECTIONS_SHOWN:
+			lines.append("... (%d more)" % (_detections.size() - shown))
+			break
+		var x: float = detection.get("x", 0.0)
+		var y: float = detection.get("y", 0.0)
+		var w: float = detection.get("w", 0.0)
+		var h: float = detection.get("h", 0.0)
+		var cls: String = detection.get("class_name", "?")
+		lines.append("%s frac(%.3f,%.3f %.3fx%.3f)" % [cls, x, y, w, h])
+		lines.append("  model_px(%d,%d %dx%d) canvas_px(%d,%d %dx%d)" % [
+			int(x * net_size), int(y * net_size), int(w * net_size), int(h * net_size),
+			int(x * _canvas_size.x), int(y * _canvas_size.y), int(w * _canvas_size.x), int(h * _canvas_size.y),
+		])
+		shown += 1
+
+	var panel_width := DEBUG_PANEL_WIDTH
+	var panel_height: float = lines.size() * DEBUG_LINE_HEIGHT + 12.0
+	var panel_x := _canvas_size.x - panel_width
+	draw_rect(Rect2(panel_x, 0, panel_width, panel_height), DEBUG_BG_COLOR, true)
+
+	for i in range(lines.size()):
+		draw_string(font, Vector2(panel_x + 8.0, 16.0 + i * DEBUG_LINE_HEIGHT), lines[i], HORIZONTAL_ALIGNMENT_LEFT, panel_width - 16.0, DEBUG_FONT_SIZE, DEBUG_TEXT_COLOR)

@@ -49,6 +49,11 @@ var detection_rate_hz: float = 1.0
 var detection_confidence_threshold: float = 0.5
 var detection_backend: String = "auto" # "auto" | "npu" | "gpu" -- no "cpu", see InferenceEngine's doc comment
 var detection_show_overlay: bool = true
+## Defaults true while the overlay coordinate-mapping bug (boxes sized
+## right, positioned wrong, reproducible with the camera held still) is
+## still being tracked down -- see detection_overlay_content.gd's debug
+## panel. Flip off once that's resolved; leaving the toggle in either way.
+var detection_show_debug_info: bool = true
 var detection_referee_exclusion_enabled: bool = true
 ## Pick-a-color-and-a-tolerance replaces 6 raw HSV min/max fields with
 ## something a color wheel can actually drive -- see
@@ -85,6 +90,7 @@ func load_settings() -> void:
 	detection_confidence_threshold = clampf(cfg.get_value("detection", "confidence_threshold", detection_confidence_threshold), DETECTION_CONFIDENCE_MIN, DETECTION_CONFIDENCE_MAX)
 	detection_backend = cfg.get_value("detection", "backend", detection_backend)
 	detection_show_overlay = cfg.get_value("detection", "show_overlay", detection_show_overlay)
+	detection_show_debug_info = cfg.get_value("detection", "show_debug_info", detection_show_debug_info)
 	detection_referee_exclusion_enabled = cfg.get_value("detection", "referee_exclusion_enabled", detection_referee_exclusion_enabled)
 	detection_vest_color = cfg.get_value("detection", "vest_color", detection_vest_color)
 	detection_vest_color_tolerance = clampf(cfg.get_value("detection", "vest_color_tolerance", detection_vest_color_tolerance), VEST_COLOR_TOLERANCE_MIN, VEST_COLOR_TOLERANCE_MAX)
@@ -109,6 +115,7 @@ func save_settings() -> void:
 	cfg.set_value("detection", "confidence_threshold", detection_confidence_threshold)
 	cfg.set_value("detection", "backend", detection_backend)
 	cfg.set_value("detection", "show_overlay", detection_show_overlay)
+	cfg.set_value("detection", "show_debug_info", detection_show_debug_info)
 	cfg.set_value("detection", "referee_exclusion_enabled", detection_referee_exclusion_enabled)
 	cfg.set_value("detection", "vest_color", detection_vest_color)
 	cfg.set_value("detection", "vest_color_tolerance", detection_vest_color_tolerance)

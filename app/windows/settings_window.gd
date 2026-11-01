@@ -58,6 +58,7 @@ extends PanelContainer
 @onready var _detection_backend_option: OptionButton = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendRow/OptionButton
 @onready var _detection_backend_status_label: Label = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/BackendStatusRow/StatusLabel
 @onready var _detection_show_overlay: CheckButton = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ShowOverlayRow/CheckButton
+@onready var _detection_show_debug_info: CheckButton = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/ShowDebugInfoRow/CheckButton
 @onready var _detection_referee_exclusion: CheckButton = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/RefereeExclusionRow/CheckButton
 @onready var _vest_color: ColorPickerButton = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestColorRow/ColorPickerButton
 @onready var _vest_tolerance: HSlider = $Margin/OuterVBox/Tabs/AIDetection/CenterRegion/ScrollContainer/VBox/VestToleranceRow/HSlider
@@ -142,6 +143,9 @@ func _setup_ai_tab() -> void:
 
 	_detection_show_overlay.button_pressed = Settings.detection_show_overlay
 	_detection_show_overlay.toggled.connect(_on_detection_show_overlay_toggled)
+
+	_detection_show_debug_info.button_pressed = Settings.detection_show_debug_info
+	_detection_show_debug_info.toggled.connect(_on_detection_show_debug_info_toggled)
 
 	_detection_referee_exclusion.button_pressed = Settings.detection_referee_exclusion_enabled
 	_detection_referee_exclusion.toggled.connect(_on_detection_referee_exclusion_toggled)
@@ -237,6 +241,10 @@ func _on_detection_backend_selected(index: int) -> void:
 
 func _on_detection_show_overlay_toggled(pressed: bool) -> void:
 	Settings.detection_show_overlay = pressed
+	Settings.save_settings()
+
+func _on_detection_show_debug_info_toggled(pressed: bool) -> void:
+	Settings.detection_show_debug_info = pressed
 	Settings.save_settings()
 
 func _on_detection_referee_exclusion_toggled(pressed: bool) -> void:

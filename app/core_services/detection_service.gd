@@ -23,7 +23,12 @@ extends Node
 ## decode work per detect() call, not extra GPU time, since the forward
 ## pass already computes scores for all 80 regardless of which we read.
 
-signal detections_updated(detections: Array)
+## frame_info carries the source/model resolutions a given detections
+## batch was computed from -- {"source_width", "source_height",
+## "net_input_size"} -- so a diagnostic overlay can show exactly what
+## numbers were involved at each stage of the pipeline, not just the
+## final drawn result. See detection_overlay_content.gd's debug panel.
+signal detections_updated(detections: Array, frame_info: Dictionary)
 
 const MODEL_DIR := "res://assets/models/"
 const MODEL_PARAM := MODEL_DIR + "nanodet-plus-m_416.param"
@@ -164,7 +169,12 @@ func _detection_loop() -> void:
 			_apply_referee_exclusion(detections, rgb_bytes, width, height)
 		_add_position_estimates(detections)
 		print("DetectionService: inference on %dx%d frame -> %d detection(s)" % [width, height, detections.size()])
-		call_deferred("emit_signal", "detections_updated", detections)
+		var frame_info := {
+			"source_width": width,
+			"source_height": height,
+			"net_input_size": MODEL_INPUT_SIZE,
+		}
+		call_deferred("emit_signal", "detections_updated", detections, frame_info)
 
 ## Flags each person detection as referee_excluded (in place) via
 ## InferenceEngine.check_vest_color() -- an appearance cue (the vest a
