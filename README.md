@@ -33,6 +33,33 @@ FPVR expects a USB-connected UAV setup: a UVC camera for FPV video, a serial GPS
 
 [**FPVBox**](https://github.com/ItsRebaseTime/FPVBox) is a companion hardware project providing ELRS, GNSS, and video receiver (VRX) functionality to the Steam Frame — or any other supported system — over USB, so FPVR has something to plug into.
 
+## Status
+
+What's implemented, what's been verified on real hardware, and what's still open — see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the detail behind any of these.
+
+**Done and tested on real hardware**
+- [x] UVC FPV video capture + MJPEG decode (USB webcam and a real analog FPV receiver)
+- [x] NMEA GPS parsing and CRSF ELRS parsing/channel packing
+- [x] AI person/vehicle detection (NCNN/Vulkan, GPU-only) running live on Steam Frame
+- [x] Referee exclusion via vest-color matching
+- [x] Detection overlay (bounding boxes + color-coded legend) on the FPV feed, coordinate-mapping bug fixed and verified on-device
+- [x] ATAK CoT bridge over UDP multicast (position + AI sightings, real packets received and validated)
+- [x] VR shell (`shell_vr_steamframe`) running on real Steam Frame hardware
+- [x] Android shell on a Pixel 10 Pro: USB serial, UVC via raw usbfs, phone GNSS fallback
+- [x] Settings UI (centered layout, vest color wheel, sliders)
+
+**Done, but only lightly tested / partially verified**
+- [ ] CDC-ACM serial GPS/ELRS on Android (only a UVC-class device has been attached during Android testing so far)
+- [ ] The `uvcvideo`-absent fallback capture path specifically on Steam Frame (verified on Android and two other real UVC devices; the test Steam Frame unit currently has `uvcvideo` bound, so the true "no kernel driver at all" condition on that device hasn't been exercised live)
+- [ ] Passthrough IR/RGB/Black toggling (best-effort — Valve hasn't published an API to tell stock monochrome passthrough apart from the third-party color camera)
+- [ ] Ground-plane distance/GPS estimation for a detection (implemented; real-world accuracy against a known offset not yet logged)
+- [ ] Devcontainer + GitHub Actions release pipeline (just added — this is its first real run)
+
+**Not done yet**
+- [ ] TAK-server TCP/TLS unicast, for a teammate's phone with no shared local network/radio (local UDP multicast only for now — explicit v1 scope decision)
+- [ ] Hexagon NPU (QNN) backend as an alternative to Vulkan (stretch goal; Vulkan is what actually ships)
+- [ ] Verifying OpenXR controller button/action bindings against the real Steam Frame controllers (currently Godot's default action map)
+
 ## Development
 
 Architecture, build instructions, platform status, and the AI detection pipeline are documented in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
