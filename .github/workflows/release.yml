@@ -1,0 +1,88 @@
+name: Release
+
+# Builds and publishes a Steam Frame release whenever `dev` work lands on
+# `main` -- the whole point of the dev/main split is that merging to main
+# *is* the "cut a release" action, so this is the only trigger.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Same image used for the local VSCode Dev Container (.devcontainer/
+      # Dockerfile) -- one definition for both, so this build is exactly
+      # the one a contributor can reproduce on their own machine.
+      - name: Build devcontainer image
+        run: docker build -t fpvr-build .devcontainer
+
+      - name: Build Steam Frame release inside container
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            fpvr-build \
+            bash -c '
+              set -euo pipefail
+              core/scripts/build_ncnn_arm64.sh
+              core/scripts/build_core_arm64.sh template_release
+              cd app
+              mkdir -p builds/steamframe
+              godot --headless --path . --export-release "Steam Frame (Linux ARM64)" builds/steamframe/fpvr.arm64
+            '
+
+      - name: Package release
+        id: package
+        run: |
+          VERSION="0.1.${{ github.run_number }}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          cd app/builds/steamframe
+          zip -r "${{ github.workspace }}/fpvr-steamframe.zip" .
+          cd "${{ github.workspace }}"
+          sha256sum fpvr-steamframe.zip | awk '{print $1}' > fpvr-steamframe.sha256
+
+      # FramePort (github.com/spoopyghosty0/frameport) installs from a
+      # manifest URL, not a bare release asset -- generated fresh each
+      # release so its version/sha256/url always match the asset just
+      # built, then published as a release asset itself so
+      # raw.githubusercontent.com/.../releases/latest/download/... stays a
+      # stable "always current" manifest link for the README's install
+      # button.
+      - name: Generate FramePort manifest
+        run: |
+          VERSION="${{ steps.package.outputs.version }}"
+          SHA256="$(cat fpvr-steamframe.sha256)"
+          ASSET_URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/fpvr-steamframe.zip"
+          ICON_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/app/launcher_icon_main_192.png"
+          cat > frameport-manifest.json <<EOF
+          {
+            "schema": "framedrop.install/v1",
+            "name": "FPVR",
+            "version": "${VERSION}",
+            "files": [
+              { "url": "${ASSET_URL}", "sha256": "${SHA256}" }
+            ],
+            "frameport": {
+              "description": "Real-time UAV ground control: FPV video, GPS map, and AI person/vehicle detection with ATAK integration.",
+              "icon": "${ICON_URL}"
+            }
+          }
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.package.outputs.version }}
+          name: v${{ steps.package.outputs.version }}
+          files: |
+            fpvr-steamframe.zip
+            frameport-manifest.json

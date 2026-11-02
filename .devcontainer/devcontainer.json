@@ -1,0 +1,19 @@
+{
+	"name": "FPVR build environment",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+	"workspaceFolder": "/workspace",
+	"remoteEnv": {
+		"PRESTAGED_VULKAN_LIB": "/opt/sysroot-arm64/usr/lib/libvulkan.so"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"geequlim.godot-tools",
+				"ms-vscode.cpptools"
+			]
+		}
+	}
+}
